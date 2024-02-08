@@ -17,7 +17,9 @@ class GetRangeOfAttendancesByEmployeeIdUseCase @Inject constructor(
 
         return if (attendancesResult is Result.Success) {
             val filteredAttendances = attendancesResult.data.filter {
-                it.date.after(startDate) && it.date.before(endDate)
+                (it.date.equals(startDate) || it.date.after(startDate)) && (it.date.equals(endDate) || it.date.before(
+                    endDate
+                ))
             }
             Result.Success(filteredAttendances)
         } else {
