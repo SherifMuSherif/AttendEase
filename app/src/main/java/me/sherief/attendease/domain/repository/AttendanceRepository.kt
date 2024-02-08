@@ -7,7 +7,5 @@ interface AttendanceRepository {
     suspend fun getAttendanceById(id: String): Result<Attendance>
     suspend fun getAllAttendances(): Result<List<Attendance>>
     suspend fun getAttendancesByEmployeeId(employeeId: String): Result<List<Attendance>>
-    suspend fun addAttendance(attendance: Attendance): Result<Any>
-    suspend fun updateAttendance(attendance: Attendance): Result<Attendance>
-
+    suspend fun addAttendance(attendance: Attendance): Result<Attendance>
 }

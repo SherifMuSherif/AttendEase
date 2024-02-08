@@ -8,13 +8,12 @@ import javax.inject.Inject
 
 class AddAttendanceUseCase @Inject constructor(
     private val attendanceRepository: AttendanceRepository,
-    private val updateAttendanceUseCase: UpdateAttendanceUseCase
+    private val getTotalHoursPerDayUseCase: GetTotalHoursPerDayUseCase
 ) {
-    suspend operator fun invoke(attendance: Attendance): Result<Any> {
-        return if (attendance.totalHours == 0f) {
-            updateAttendanceUseCase(attendance)
-        } else {
-            attendanceRepository.addAttendance(attendance)
-        }
+    suspend operator fun invoke(attendance: Attendance): Result<Attendance> {
+        val totalHours = getTotalHoursPerDayUseCase(attendance.timeIn, attendance.timeOut)
+        val updatedAttendance = attendance.copy(totalHours = totalHours)
+        return attendanceRepository.addAttendance(updatedAttendance)
+
     }
 }
