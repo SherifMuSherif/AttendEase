@@ -1,5 +1,5 @@
 package me.sherief.attendease.domain.util
 
 interface ErrorHandler {
-    fun getError(throwable: Throwable): ErrorEntity
+    fun getError(throwable: Throwable): DomainException
 }
