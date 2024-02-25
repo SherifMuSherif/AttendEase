@@ -1,7 +1,10 @@
 package me.sherief.attendease.domain.usecase
 
+import kotlinx.datetime.LocalDate
+import me.sherief.attendease.domain.model.Attendance
+import me.sherief.attendease.domain.model.HoursAndMinutes
 import me.sherief.attendease.domain.util.Result
-import java.util.Date
+import me.sherief.attendease.domain.util.map
 import javax.inject.Inject
 
 class GetEmployeeTotalHoursUseCase @Inject constructor(
@@ -9,22 +12,25 @@ class GetEmployeeTotalHoursUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         employeeId: String,
-        startDate: Date,
-        endDate: Date
-    ): Float {
-        val attendancesResult =
-            getRangeOfAttendancesByEmployeeIdUseCase(employeeId, startDate, endDate)
-        var employeeTotalHours = 0f
-        when (attendancesResult) {
-            is Result.Success -> {
-                attendancesResult.data.forEach {
-                    employeeTotalHours += it.totalHours
-                }
-            }
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): Result<HoursAndMinutes> {
 
-            is Result.Error -> TODO()
+        return getRangeOfAttendancesByEmployeeIdUseCase(
+            employeeId,
+            startDate,
+            endDate
+        ).map {
+            sumAttendanceHours(it)
         }
 
+    }
+
+    private fun sumAttendanceHours(attendanceList: List<Attendance>): HoursAndMinutes {
+        val employeeTotalHours = HoursAndMinutes(0, 0)
+        attendanceList.forEach {
+            employeeTotalHours += it.totalHoursAndMinutes
+        }
         return employeeTotalHours
     }
 }

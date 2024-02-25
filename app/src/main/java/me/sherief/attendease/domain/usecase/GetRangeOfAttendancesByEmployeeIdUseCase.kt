@@ -1,8 +1,11 @@
 package me.sherief.attendease.domain.usecase
 
+import kotlinx.datetime.LocalDate
 import me.sherief.attendease.domain.model.Attendance
+import me.sherief.attendease.domain.util.EmptyRecord
 import me.sherief.attendease.domain.util.Result
-import java.util.Date
+import me.sherief.attendease.domain.util.flatMap
+import me.sherief.attendease.domain.util.isDateInRange
 import javax.inject.Inject
 
 class GetRangeOfAttendancesByEmployeeIdUseCase @Inject constructor(
@@ -10,20 +13,19 @@ class GetRangeOfAttendancesByEmployeeIdUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         employeeId: String,
-        startDate: Date,
-        endDate: Date
+        startDate: LocalDate,
+        endDate: LocalDate
     ): Result<List<Attendance>> {
-        val attendancesResult = getAttendancesByEmployeeIdUseCase(employeeId)
 
-        return if (attendancesResult is Result.Success) {
-            val filteredAttendances = attendancesResult.data.filter {
-                (it.date.equals(startDate) || it.date.after(startDate)) && (it.date.equals(endDate) || it.date.before(
-                    endDate
-                ))
+
+        return getAttendancesByEmployeeIdUseCase(employeeId)
+            .flatMap { attendancesResult ->
+                attendancesResult.filter { attendance ->
+                    isDateInRange(attendance.date, startDate, endDate)
+                }.takeIf { it.isNotEmpty() }
+                    ?.let { Result.success(it) }
+                    ?: Result.failure(EmptyRecord("No Attendances found for this EmployeeId $employeeId form $startDate to $endDate"))
             }
-            Result.Success(filteredAttendances)
-        } else {
-            attendancesResult
-        }
     }
+
 }
