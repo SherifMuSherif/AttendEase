@@ -93,10 +93,11 @@ fun <R> Result<R>.onFailureReturn(value: R): Result<R> = when (this) {
  *
  * @return the result of the invoked function
  */
-inline fun <R> Result<R>.fold(onSuccess: (R) -> R, onFailure: (Throwable) -> R): R = when (this) {
-    is Result.Success -> onSuccess(this.value)
-    is Result.Failure -> onFailure(this.exception)
-}
+inline fun <R, T> Result<T>.fold(onSuccess: (value: T) -> R, onFailure: (Throwable) -> R): R =
+    when (this) {
+        is Result.Success -> onSuccess(this.value)
+        is Result.Failure -> onFailure(this.exception)
+    }
 
 /**
  * Calls a mapper function with the value of `this` as its parameter if `this` is an instance of [Result.Success].
@@ -110,7 +111,13 @@ inline fun <T, R> Result<T>.map(transform: (T) -> R): Result<R> = when (this) {
     is Result.Failure -> Result.failure(this.exception)
 }
 
-
+/**
+ *  Transforms the value of this Result if it is a Success, or returns the original Failure if not.
+ *
+ *  @param transform a function that takes the Success value and returns a new Result
+ *
+ *  @return a new Result that is either a transformed Success or the original Failure
+ */
 inline fun <R, T> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> = when (this) {
     is Result.Success -> transform(this.getOrThrow())
     is Result.Failure -> Result.failure(this.exception)
@@ -177,12 +184,26 @@ inline fun <T> Result<T>.onSuccess(action: (value: T) -> Unit): Result<T> = also
     it.getOrNull()?.let(action)
 }
 
+/**
+ * Converts this Result to a Success by applying a function to the Failure exception if present, or returns the original Success if not.
+ *
+ * @param transform a function that takes the Failure exception and returns a new Success value
+ *
+ * @return a new Result that is either a recovered Success or the original Success
+ */
 inline fun <R, T : R> Result<T>.recover(transform: (exception: Throwable) -> R): Result<R> =
     when (this) {
         is Result.Failure -> Result.success(transform(exception))
         is Result.Success -> this
     }
 
+/**
+ * Converts this Result to a Success by applying a function to the Failure exception if present, catching any exception thrown by the function and returning it as a new Failure, or returns the original Success if not.
+ *
+ * @param transform a function that takes the Failure exception and returns a new Success value, or throws an exception
+ *
+ * @return a new Result that is either a recovered Success, a new Failure, or the original Success
+ */
 inline fun <R, T : R> Result<T>.recoverCatching(transform: (exception: Throwable) -> R): Result<R> {
     return when (val exception = exceptionOrNull()) {
         null -> this
@@ -190,6 +211,13 @@ inline fun <R, T : R> Result<T>.recoverCatching(transform: (exception: Throwable
     }
 }
 
+/**
+ * Transforms the value of this Result if it is a Success, catching any exception thrown by the function and returning it as a new Failure, or returns the original Failure if not.
+ *
+ * @param transform a function that takes the Success value and returns a new Result, or throws an exception
+ *
+ * @return a new Result that is either a transformed Success, a new Failure, or the original Failure
+ */
 inline fun <R, T> Result<T>.flatMapCatching(transform: (value: T) -> Result<R>): Result<R> {
     return when (this) {
         is Result.Failure -> Result.failure(exception)
@@ -197,6 +225,11 @@ inline fun <R, T> Result<T>.flatMapCatching(transform: (value: T) -> Result<R>):
     }
 }
 
+/**
+ * Converts this value to a Result, wrapping it in a Success if it is not a Throwable, or in a Failure if it is a Throwable.
+ *
+ * @return a Result that is either a Success with this value, or a Failure with this value as the exception
+ */
 fun <T> T.toResult(): Result<T> = when (this) {
     is Throwable -> Result.failure(this)
     else -> Result.success(this)
