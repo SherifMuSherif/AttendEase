@@ -10,10 +10,12 @@ import javax.inject.Inject
 
 class AddAttendanceUseCase @Inject constructor(private val attendanceRepository: AttendanceRepository) {
     suspend operator fun invoke(attendance: Attendance): Result<Attendance> =
+      attendanceRepository.addAttendance(attendance)
 
+    suspend operator fun invoke(attendanceCreation: () -> Attendance): Result<Attendance> =
         doTry {
-            attendance
-        }.flatMap { validAttendance ->
-            attendanceRepository.addAttendance(validAttendance)
+            attendanceCreation()
+        }.flatMap {
+            attendanceRepository.addAttendance(it)
         }
 }
