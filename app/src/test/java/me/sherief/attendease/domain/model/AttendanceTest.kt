@@ -20,7 +20,7 @@ class AttendanceTest {
             employeeId = "1",
             date = LocalDate(2024, 2, 15),
             timeIn = LocalDateTime(2024, 2, 15, 9, 0, 0),
-            timeOut = LocalDateTime(2024, 2, 15, 17, 0, 0),
+            _timeOut = LocalDateTime(2024, 2, 15, 17, 0, 0),
             _totalHoursAndMinutes = HoursAndMinutes(1, 0)
         )
 
@@ -34,7 +34,7 @@ class AttendanceTest {
             employeeId = "1",
             date = LocalDate(2024, 2, 15),
             timeIn = LocalDateTime(2024, 2, 15, 9, 0, 0),
-            timeOut = LocalDateTime(2024, 2, 15, 17, 0, 0),
+            _timeOut = LocalDateTime(2024, 2, 15, 17, 0, 0),
         )
 
         // Get the private method by its name
@@ -56,11 +56,27 @@ class AttendanceTest {
             employeeId = "1",
             date = LocalDate(2024, 2, 15),
             timeIn = LocalDateTime(2024, 2, 15, 9, 0, 0),
-            timeOut = LocalDateTime(2024, 2, 15, 10, 30, 0),
+            _timeOut = LocalDateTime(2024, 2, 15, 10, 30, 0),
             _totalHoursAndMinutes = HoursAndMinutes(0, 0)
         )
 
         assertThat(attendance.totalHoursAndMinutes).isEqualTo(HoursAndMinutes(1, 30))
+    }
+
+    @Test
+    fun `should return HoursAndMinutes(1, 30) after call updateTimeOut method given 1 hour and 30 minutes difference LocalDateTimes`() {
+        val attendance = Attendance(
+            attendanceId = "1",
+            employeeId = "1",
+            date = LocalDate(2024, 2, 15),
+            timeIn = LocalDateTime(2024, 2, 15, 9, 0, 0)
+        )
+
+        val newTimeOut = LocalDateTime(2024, 2, 15, 10, 30, 0)
+        attendance.updateTimeOut(newTimeOut)
+
+        assertThat(attendance.totalHoursAndMinutes).isEqualTo(HoursAndMinutes(1, 30))
+        assertThat(attendance.timeOut).isEqualTo(newTimeOut)
     }
 
     @Test
@@ -72,7 +88,7 @@ class AttendanceTest {
                 employeeId = "1",
                 date = LocalDate(2024, 2, 15),
                 timeIn = LocalDateTime(2024, 2, 15, 17, 0, 0),
-                timeOut = LocalDateTime(2024, 2, 15, 9, 0, 0),
+                _timeOut = LocalDateTime(2024, 2, 15, 9, 0, 0),
             )
         }
     }
@@ -86,8 +102,36 @@ class AttendanceTest {
                 employeeId = "1",
                 date = LocalDate(2024, 2, 15),
                 timeIn = LocalDateTime(2024, 2, 15, 9, 0, 0),
-                timeOut = LocalDateTime(2024, 2, 15, 9, 0, 0),
+                _timeOut = LocalDateTime(2024, 2, 15, 9, 0, 0),
             )
+        }
+    }
+
+    @Test
+    fun `should throw InvalidTimeRangeException when call updateTimeOut method with given timeOut is equal timeIn`() {
+        val attendance = Attendance(
+            attendanceId = "1",
+            employeeId = "1",
+            date = LocalDate(2024, 2, 15),
+            timeIn = LocalDateTime(2024, 2, 15, 9, 0, 0),
+            _totalHoursAndMinutes = HoursAndMinutes(1, 0)
+        )
+        assertThrows(InvalidTimeRangeException::class.java) {
+            attendance.updateTimeOut(LocalDateTime(2024, 2, 15, 9, 0, 0))
+        }
+    }
+
+    @Test
+    fun `should throw InvalidTimeRangeException when call updateTimeOut method with given timeOut before timeIn`() {
+        val attendance = Attendance(
+            attendanceId = "1",
+            employeeId = "1",
+            date = LocalDate(2024, 2, 15),
+            timeIn = LocalDateTime(2024, 2, 15, 9, 0, 0),
+            _totalHoursAndMinutes = HoursAndMinutes(1, 0)
+        )
+        assertThrows(InvalidTimeRangeException::class.java) {
+            attendance.updateTimeOut(LocalDateTime(2024, 2, 15, 8, 0, 0))
         }
     }
 }
