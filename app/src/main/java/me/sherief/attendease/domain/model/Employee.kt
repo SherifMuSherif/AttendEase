@@ -75,34 +75,38 @@ data class Attendance(
 /**
  * A class that represents a duration of time in hours and minutes.
  *
- * @property hours The number of hours in the duration.
- * @property minutes The number of minutes in the duration.
- * @constructor Initializes the properties of the [HoursAndMinutes] object and adjusts them if [minutes] is 60 or more.
+ * @property _hours The number of hours in the duration.
+ * @property _minutes The number of minutes in the duration.
+ * @constructor Initializes the properties of the [HoursAndMinutes] object and adjusts them if [_minutes] is 60 or more.
  */
-data class HoursAndMinutes(private var hours: Long, private var minutes: Int) {
+data class HoursAndMinutes(private var _hours: Long, private var _minutes: Int) {
     init {
         // If total minutes is 60 or more, convert it to hours
         adjustTimeForMinutesOverflow()
     }
 
+    val hours: Long get() = _hours
+    val minutes: Int get() = _minutes
+
+
     /**
      * Adds another [HoursAndMinutes] object to the current one and assigns the result to the current one.
      */
     operator fun plusAssign(other: HoursAndMinutes) {
-        this.hours += other.hours
-        this.minutes += other.minutes
+        this._hours += other._hours
+        this._minutes += other._minutes
 
         // If total minutes is 60 or more, convert it to hours
         adjustTimeForMinutesOverflow()
     }
 
     /**
-     * Adjusts the [hours] and [minutes] properties if [minutes] is 60 or more by subtracting 60 from [minutes] and adding 1 to [hours].
+     * Adjusts the [_hours] and [_minutes] properties if [_minutes] is 60 or more by subtracting 60 from [_minutes] and adding 1 to [_hours].
      */
     private fun adjustTimeForMinutesOverflow() {
-        if (this.minutes >= 60) {
-            this.minutes -= 60
-            this.hours++
+        if (this._minutes >= 60) {
+            this._minutes -= 60
+            this._hours++
         }
     }
 }
