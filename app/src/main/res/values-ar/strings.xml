@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AttendEase</string>
+    <string name="invalid_time_range_exception">يجب ان يكون وقت الانصراف بعد وقت الحضور.</string>
+    <string name="error_sorry_not_able_to_load">ناسف ، يوجد خطا ما.</string>
+    <string name="empty_record_exception">ناسف ، لا يوجد اي معلومات.</string>
+</resources>

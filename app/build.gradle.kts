@@ -66,10 +66,17 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.google.truth:truth:1.4.0")
+    androidTestImplementation("com.google.truth:truth:1.4.0")
+
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     testImplementation("org.mockito:mockito-core:5.10.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
+    androidTestImplementation("org.mockito:mockito-android:5.10.0")
+    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
+
+
+
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
@@ -85,4 +92,12 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.1.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
+    // Room
+    val roomVersion = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+
+    implementation("com.google.zxing:core:3.5.2")
 }
